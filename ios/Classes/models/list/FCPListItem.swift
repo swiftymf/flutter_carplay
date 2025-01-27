@@ -47,7 +47,17 @@ class FCPListItem {
       }
     }
     if image != nil {
-      listItem.setImage(UIImage().fromFlutterAsset(name: image!))
+        if image!.starts(with: "http") {
+            DispatchQueue.global(qos: .background).async {
+                let url = URL(string: self.image!)
+                let stationImage = try? UIImage(withURL: url!)
+                DispatchQueue.main.async {
+                    listItem.setImage(stationImage)
+                }
+            }
+        } else  {
+            listItem.setImage(UIImage().fromFlutterAsset(name: image!))
+        }
     }
     if playbackProgress != nil {
       listItem.playbackProgress = playbackProgress!
@@ -83,8 +93,15 @@ class FCPListItem {
       self.detailText = detailText
     }
     if image != nil {
-      self._super?.setImage(UIImage().fromFlutterAsset(name: image!))
-      self.image = image
+      if image!.starts(with: "http") {
+        let url = URL(string: image!)
+        let stationImage = try? UIImage(withURL: url!)
+        self._super?.setImage(stationImage)
+        self.image = image
+      } else  {
+        self._super?.setImage(UIImage().fromFlutterAsset(name: image!))
+        self.image = image      
+      }
     }
     if playbackProgress != nil {
       self._super?.playbackProgress = playbackProgress!
